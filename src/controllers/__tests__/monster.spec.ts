@@ -91,16 +91,34 @@ describe('MonsterController', () => {
   });
 
   describe('Import CSV', () => {
-    test('should fail when importing csv file with an empty monster', () => {
-      // @TODO
+    test('should fail when importing csv file with an empty monster', async () => {
+      const response = await request(server)
+        .post('/monsters/import')
+        .attach(
+          'monsters',
+          `${__dirname}/../../../data/monsters-empty-monster.csv`
+        );
+      expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+      expect(response.body.message).toBe('Wrong data mapping.');
     });
 
-    test('should fail when importing csv file with wrong or inexistent columns.', () => {
-      // @TODO
+    test('should fail when importing csv file with wrong or inexistent columns.', async () => {
+      const response = await request(server)
+        .post('/monsters/import')
+        .attach(
+          'monsters',
+          `${__dirname}/../../../data/monsters-wrong-column.csv`
+        );
+
+      expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+      expect(response.body.message).toBe('Wrong data mapping.');
     });
 
-    test('should import all the CSV objects into the database successfully', () => {
-      // @TODO
+    test('should import all the CSV objects into the database successfully', async () => {
+      const response = await request(server)
+        .post('/monsters/import')
+        .attach('monsters', `${__dirname}/../../../data/monsters-correct.csv`);
+      expect(response.status).toBe(StatusCodes.CREATED);
     });
   });
 });

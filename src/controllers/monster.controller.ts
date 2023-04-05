@@ -8,6 +8,11 @@ import { readFileSync } from 'fs';
 export const get = async (req: Request, res: Response): Promise<Response> => {
   const id: Id = req.params.id;
   const monster = await Monster.query().findById(id);
+
+  if (!monster) {
+    return res.sendStatus(StatusCodes.NOT_FOUND);
+  }
+
   return res.status(StatusCodes.OK).json(monster);
 };
 
@@ -24,7 +29,12 @@ export const update = async (
   res: Response
 ): Promise<Response> => {
   const id: Id = req.params.id;
-  await Monster.query().findById(id).patch(req.body);
+  const updatedMonster = await Monster.query().findById(id).patch(req.body);
+
+  if (!updatedMonster) {
+    return res.sendStatus(StatusCodes.NOT_FOUND);
+  }
+
   return res.sendStatus(StatusCodes.OK);
 };
 
@@ -33,7 +43,12 @@ export const remove = async (
   res: Response
 ): Promise<Response> => {
   const id: Id = req.params.id;
-  await Monster.query().deleteById(id);
+  const removedMonster = await Monster.query().deleteById(id);
+
+  if (!removedMonster) {
+    return res.sendStatus(StatusCodes.NOT_FOUND);
+  }
+
   return res.sendStatus(StatusCodes.NO_CONTENT);
 };
 
@@ -54,10 +69,17 @@ export const importCsv = async (
   return res.sendStatus(StatusCodes.CREATED);
 };
 
+export const list = async (req: Request, res: Response): Promise<Response> => {
+  const monsters = await Monster.query();
+
+  return res.status(StatusCodes.OK).json(monsters);
+};
+
 export const MonsterController = {
   get,
   create,
   update,
   remove,
   importCsv,
+  list,
 };
